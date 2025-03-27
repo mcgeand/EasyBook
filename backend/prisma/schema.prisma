@@ -10,14 +10,20 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum CalendarProvider {
+  GOOGLE
+  OUTLOOK
+}
+
 model User {
-  id        Int       @id @default(autoincrement())
-  email     String    @unique
+  id        Int        @id @default(autoincrement())
+  email     String     @unique
   password  String
   name      String?
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime  @updatedAt @map("updated_at")
-  bookings  Booking[] // User can have many bookings
+  createdAt DateTime   @default(now()) @map("created_at")
+  updatedAt DateTime   @updatedAt @map("updated_at")
+  bookings  Booking[]  // User can have many bookings
+  calendars Calendar[] // User can have many calendars
 
   @@map("users")
 }
@@ -50,4 +56,21 @@ model Booking {
   service   Service   @relation(fields: [serviceId], references: [id], onDelete: Cascade)
 
   @@map("bookings")
+}
+
+model Calendar {
+  id           String           @id @default(uuid())
+  userId       Int              @map("user_id")
+  provider     CalendarProvider
+  email        String
+  accessToken  String?
+  refreshToken String?
+  tokenExpiry  DateTime?        @map("token_expiry")
+  timezone     String?
+  connectedAt  DateTime         @map("connected_at")
+  createdAt    DateTime         @default(now()) @map("created_at")
+  updatedAt    DateTime         @updatedAt @map("updated_at")
+  user         User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("calendars")
 } 
