@@ -29,10 +29,23 @@ export class CalendarService {
    * Get all calendars, optionally filtered by userId
    */
   async getAllCalendars(userId?: number) {
-    const filter = userId ? { where: { userId } } : {};
+    if (userId) {
+      return prisma.calendar.findMany({
+        where: { userId },
+        include: {
+          user: {
+            select: {
+              id: true,
+              email: true,
+              name: true,
+              // Exclude password for security
+            }
+          }
+        }
+      });
+    }
     
     return prisma.calendar.findMany({
-      ...filter,
       include: {
         user: {
           select: {
