@@ -11,6 +11,8 @@ dotenv.config();
 // Routes
 import bookingRoutes from './routes/booking.routes';
 import userRoutes from './routes/user.routes';
+import healthRoutes from './routes/health.routes';
+import serviceRoutes from './routes/service.routes';
 
 // Initialize Express app
 const app: Express = express();
@@ -35,11 +37,8 @@ app.use(express.json());
 // Routes
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/users', userRoutes);
-
-// Health check endpoint
-app.get('/api/health', (req: Request, res: Response): void => {
-  res.status(200).json({ status: 'OK', message: 'Server is running' });
-});
+app.use('/api/health', healthRoutes);
+app.use('/api/services', serviceRoutes);
 
 /**
  * Global error handling middleware

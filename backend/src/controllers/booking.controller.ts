@@ -3,18 +3,20 @@ import { prisma } from '../index';
 import { BookingService } from '../services/booking.service';
 
 interface BookingCreateRequest {
-  title: string;
-  description?: string;
   startTime: string; // ISO string format
   endTime: string; // ISO string format
+  status?: string;
+  notes?: string;
   userId: number;
+  serviceId: number;
 }
 
 interface BookingUpdateRequest {
-  title?: string;
-  description?: string;
   startTime?: string; // ISO string format
   endTime?: string; // ISO string format
+  status?: string;
+  notes?: string;
+  serviceId?: number;
 }
 
 const bookingService = new BookingService();
@@ -75,10 +77,10 @@ const getUserBookings = async (req: Request, res: Response): Promise<void> => {
 // Create new booking
 const createBooking = async (req: Request<{}, {}, BookingCreateRequest>, res: Response): Promise<void> => {
   try {
-    const { title, description, startTime, endTime, userId } = req.body;
+    const { startTime, endTime, status, notes, userId, serviceId } = req.body;
     
-    if (!title || !startTime || !endTime || !userId) {
-      res.status(400).json({ message: 'Title, start time, end time, and user ID are required' });
+    if (!startTime || !endTime || !userId || !serviceId) {
+      res.status(400).json({ message: 'Start time, end time, user ID, and service ID are required' });
       return;
     }
     
@@ -97,11 +99,12 @@ const createBooking = async (req: Request<{}, {}, BookingCreateRequest>, res: Re
     }
     
     const booking = await bookingService.createBooking({
-      title,
-      description,
       startTime: startDate,
       endTime: endDate,
-      userId
+      status,
+      notes,
+      userId,
+      serviceId
     });
     
     res.status(201).json(booking);
@@ -121,9 +124,9 @@ const updateBooking = async (req: Request<{ id: string }, {}, BookingUpdateReque
       return;
     }
     
-    const { title, description, startTime, endTime } = req.body;
+    const { startTime, endTime, status, notes, serviceId } = req.body;
     
-    if (!title && !description && !startTime && !endTime) {
+    if (!startTime && !endTime && !status && !notes && !serviceId) {
       res.status(400).json({ message: 'At least one field is required to update' });
       return;
     }
@@ -162,10 +165,11 @@ const updateBooking = async (req: Request<{ id: string }, {}, BookingUpdateReque
     }
     
     const booking = await bookingService.updateBooking(bookingId, {
-      title,
-      description,
       startTime: startDate,
-      endTime: endDate
+      endTime: endDate,
+      status,
+      notes,
+      serviceId
     });
     
     res.status(200).json(booking);
