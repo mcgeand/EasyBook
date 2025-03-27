@@ -1,18 +1,20 @@
 import { prisma } from '../index';
 
 interface BookingCreateData {
-  title: string;
-  description?: string;
   startTime: Date;
   endTime: Date;
+  status?: string;
+  notes?: string;
   userId: number;
+  serviceId: number;
 }
 
 interface BookingUpdateData {
-  title?: string;
-  description?: string;
   startTime?: Date;
   endTime?: Date;
+  status?: string;
+  notes?: string;
+  serviceId?: number;
 }
 
 export class BookingService {

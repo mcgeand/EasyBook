@@ -1,6 +1,14 @@
+import * as React from 'react'
 import { Link } from 'react-router-dom'
 
-const NotFound = () => {
+const NotFound: React.FC = () => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLAnchorElement>): void => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault()
+      window.location.href = '/'
+    }
+  }
+
   return (
     <div className="min-h-full px-4 py-16 sm:px-6 sm:py-24 md:grid md:place-items-center lg:px-8">
       <div className="max-w-max mx-auto">
@@ -15,6 +23,9 @@ const NotFound = () => {
               <Link
                 to="/"
                 className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                aria-label="Return to home page"
+                tabIndex={0}
+                onKeyDown={handleKeyDown}
               >
                 Go back home
               </Link>

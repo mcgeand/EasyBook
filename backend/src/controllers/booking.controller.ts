@@ -2,10 +2,27 @@ import { Request, Response } from 'express';
 import { prisma } from '../index';
 import { BookingService } from '../services/booking.service';
 
+interface BookingCreateRequest {
+  startTime: string; // ISO string format
+  endTime: string; // ISO string format
+  status?: string;
+  notes?: string;
+  userId: number;
+  serviceId: number;
+}
+
+interface BookingUpdateRequest {
+  startTime?: string; // ISO string format
+  endTime?: string; // ISO string format
+  status?: string;
+  notes?: string;
+  serviceId?: number;
+}
+
 const bookingService = new BookingService();
 
 // Get all bookings
-export const getBookings = async (req: Request, res: Response) => {
+const getBookings = async (req: Request, res: Response): Promise<void> => {
   try {
     const bookings = await bookingService.getAllBookings();
     res.status(200).json(bookings);
@@ -16,13 +33,20 @@ export const getBookings = async (req: Request, res: Response) => {
 };
 
 // Get booking by ID
-export const getBookingById = async (req: Request, res: Response) => {
+const getBookingById = async (req: Request, res: Response): Promise<void> => {
   try {
     const bookingId = parseInt(req.params.id);
+    
+    if (isNaN(bookingId)) {
+      res.status(400).json({ message: 'Invalid booking ID' });
+      return;
+    }
+    
     const booking = await bookingService.getBookingById(bookingId);
     
     if (!booking) {
-      return res.status(404).json({ message: 'Booking not found' });
+      res.status(404).json({ message: 'Booking not found' });
+      return;
     }
     
     res.status(200).json(booking);
@@ -33,11 +57,16 @@ export const getBookingById = async (req: Request, res: Response) => {
 };
 
 // Get bookings by user ID
-export const getUserBookings = async (req: Request, res: Response) => {
+const getUserBookings = async (req: Request, res: Response): Promise<void> => {
   try {
     const userId = parseInt(req.params.userId);
-    const bookings = await bookingService.getBookingsByUserId(userId);
     
+    if (isNaN(userId)) {
+      res.status(400).json({ message: 'Invalid user ID' });
+      return;
+    }
+    
+    const bookings = await bookingService.getBookingsByUserId(userId);
     res.status(200).json(bookings);
   } catch (error) {
     console.error('Error getting user bookings:', error);
@@ -46,16 +75,36 @@ export const getUserBookings = async (req: Request, res: Response) => {
 };
 
 // Create new booking
-export const createBooking = async (req: Request, res: Response) => {
+const createBooking = async (req: Request<{}, {}, BookingCreateRequest>, res: Response): Promise<void> => {
   try {
-    const { title, description, startTime, endTime, userId } = req.body;
+    const { startTime, endTime, status, notes, userId, serviceId } = req.body;
+    
+    if (!startTime || !endTime || !userId || !serviceId) {
+      res.status(400).json({ message: 'Start time, end time, user ID, and service ID are required' });
+      return;
+    }
+    
+    // Validate dates
+    const startDate = new Date(startTime);
+    const endDate = new Date(endTime);
+    
+    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+      res.status(400).json({ message: 'Invalid date format' });
+      return;
+    }
+    
+    if (startDate >= endDate) {
+      res.status(400).json({ message: 'End time must be after start time' });
+      return;
+    }
     
     const booking = await bookingService.createBooking({
-      title,
-      description,
-      startTime: new Date(startTime),
-      endTime: new Date(endTime),
-      userId
+      startTime: startDate,
+      endTime: endDate,
+      status,
+      notes,
+      userId,
+      serviceId
     });
     
     res.status(201).json(booking);
@@ -66,22 +115,61 @@ export const createBooking = async (req: Request, res: Response) => {
 };
 
 // Update booking
-export const updateBooking = async (req: Request, res: Response) => {
+const updateBooking = async (req: Request<{ id: string }, {}, BookingUpdateRequest>, res: Response): Promise<void> => {
   try {
     const bookingId = parseInt(req.params.id);
-    const { title, description, startTime, endTime } = req.body;
+    
+    if (isNaN(bookingId)) {
+      res.status(400).json({ message: 'Invalid booking ID' });
+      return;
+    }
+    
+    const { startTime, endTime, status, notes, serviceId } = req.body;
+    
+    if (!startTime && !endTime && !status && !notes && !serviceId) {
+      res.status(400).json({ message: 'At least one field is required to update' });
+      return;
+    }
     
     // Check if booking exists
     const existingBooking = await bookingService.getBookingById(bookingId);
     if (!existingBooking) {
-      return res.status(404).json({ message: 'Booking not found' });
+      res.status(404).json({ message: 'Booking not found' });
+      return;
+    }
+    
+    // Validate dates if provided
+    let startDate = undefined;
+    let endDate = undefined;
+    
+    if (startTime) {
+      startDate = new Date(startTime);
+      if (isNaN(startDate.getTime())) {
+        res.status(400).json({ message: 'Invalid start time format' });
+        return;
+      }
+    }
+    
+    if (endTime) {
+      endDate = new Date(endTime);
+      if (isNaN(endDate.getTime())) {
+        res.status(400).json({ message: 'Invalid end time format' });
+        return;
+      }
+    }
+    
+    // If both dates are provided, check that start is before end
+    if (startDate && endDate && startDate >= endDate) {
+      res.status(400).json({ message: 'End time must be after start time' });
+      return;
     }
     
     const booking = await bookingService.updateBooking(bookingId, {
-      title,
-      description,
-      startTime: startTime ? new Date(startTime) : undefined,
-      endTime: endTime ? new Date(endTime) : undefined
+      startTime: startDate,
+      endTime: endDate,
+      status,
+      notes,
+      serviceId
     });
     
     res.status(200).json(booking);
@@ -92,14 +180,20 @@ export const updateBooking = async (req: Request, res: Response) => {
 };
 
 // Delete booking
-export const deleteBooking = async (req: Request, res: Response) => {
+const deleteBooking = async (req: Request, res: Response): Promise<void> => {
   try {
     const bookingId = parseInt(req.params.id);
+    
+    if (isNaN(bookingId)) {
+      res.status(400).json({ message: 'Invalid booking ID' });
+      return;
+    }
     
     // Check if booking exists
     const existingBooking = await bookingService.getBookingById(bookingId);
     if (!existingBooking) {
-      return res.status(404).json({ message: 'Booking not found' });
+      res.status(404).json({ message: 'Booking not found' });
+      return;
     }
     
     await bookingService.deleteBooking(bookingId);
@@ -108,4 +202,13 @@ export const deleteBooking = async (req: Request, res: Response) => {
     console.error('Error deleting booking:', error);
     res.status(500).json({ message: 'Error deleting booking' });
   }
+};
+
+export {
+  getBookings,
+  getBookingById,
+  getUserBookings,
+  createBooking,
+  updateBooking,
+  deleteBooking
 }; 
