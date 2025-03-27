@@ -1,3 +1,6 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,21 +17,37 @@ model User {
   name      String?
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
-  bookings  Booking[]
+  bookings  Booking[] // User can have many bookings
 
   @@map("users")
 }
 
-model Booking {
-  id          Int      @id @default(autoincrement())
-  title       String
+model Service {
+  id          Int       @id @default(autoincrement())
+  name        String
   description String?
-  startTime   DateTime @map("start_time")
-  endTime     DateTime @map("end_time")
-  userId      Int      @map("user_id")
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
-  user        User     @relation(fields: [userId], references: [id])
+  price       Float
+  duration    Int       // Duration in minutes
+  available   Boolean   @default(true)
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  bookings    Booking[] // Service can be booked many times
+
+  @@map("services")
+}
+
+model Booking {
+  id        Int       @id @default(autoincrement())
+  startTime DateTime  @map("start_time")
+  endTime   DateTime  @map("end_time")
+  status    String    @default("pending") // pending, confirmed, cancelled, completed
+  notes     String?
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  userId    Int       @map("user_id")
+  serviceId Int       @map("service_id")
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  service   Service   @relation(fields: [serviceId], references: [id], onDelete: Cascade)
 
   @@map("bookings")
 } 
