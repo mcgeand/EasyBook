@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { FormEventHandler } from 'react'
 
 interface ProfileFormData {
   name: string;
@@ -28,7 +29,7 @@ const Settings: React.FC = () => {
     }))
   }
   
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
+  const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault()
     setIsSaving(true)
     
