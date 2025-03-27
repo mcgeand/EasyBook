@@ -1,4 +1,4 @@
-import * as React from 'react'
+import React, { FormEvent, useState, KeyboardEvent, ChangeEvent, MouseEvent } from 'react'
 
 interface LoginFormData {
   email: string;
@@ -7,13 +7,13 @@ interface LoginFormData {
 }
 
 const Login: React.FC = () => {
-  const [formData, setFormData] = React.useState<LoginFormData>({
+  const [formData, setFormData] = useState<LoginFormData>({
     email: '',
     password: '',
     rememberMe: false
   })
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>): void => {
     const { name, value, type, checked } = e.target
     setFormData((prevState: LoginFormData) => ({
       ...prevState,
@@ -21,25 +21,25 @@ const Login: React.FC = () => {
     }))
   }
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>): void => {
     e.preventDefault()
     // Form submission logic would go here
     console.log('Login attempt with:', formData)
   }
 
-  const handleCreateAccount = (e: React.MouseEvent<HTMLAnchorElement>): void => {
+  const handleCreateAccount = (e: MouseEvent<HTMLAnchorElement>): void => {
     e.preventDefault()
     // Registration logic would go here
     console.log('Navigate to registration')
   }
 
-  const handleForgotPassword = (e: React.MouseEvent<HTMLAnchorElement>): void => {
+  const handleForgotPassword = (e: MouseEvent<HTMLAnchorElement>): void => {
     e.preventDefault()
     // Password recovery logic would go here
     console.log('Navigate to password recovery')
   }
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLAnchorElement>): void => {
+  const handleKeyDown = (e: KeyboardEvent<HTMLAnchorElement>): void => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault()
       e.currentTarget.click()

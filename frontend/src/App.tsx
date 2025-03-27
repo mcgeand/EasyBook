@@ -1,3 +1,4 @@
+import * as React from 'react'
 import { Routes, Route } from 'react-router-dom'
 import Layout from './components/Layout'
 import Home from './pages/Home'
@@ -6,7 +7,7 @@ import Settings from './pages/Settings'
 import Login from './pages/Login'
 import NotFound from './pages/NotFound'
 
-function App() {
+const App: React.FC = () => {
   return (
     <Routes>
       <Route path="/" element={<Layout />}>

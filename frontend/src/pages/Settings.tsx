@@ -1,53 +1,132 @@
-const Settings = () => {
+import * as React from 'react'
+
+interface ProfileFormData {
+  name: string;
+  email: string;
+  bio: string;
+  notifications: boolean;
+}
+
+const Settings: React.FC = () => {
+  const [formData, setFormData] = React.useState<ProfileFormData>({
+    name: 'John Doe',
+    email: 'john@example.com',
+    bio: 'Frontend developer and booking enthusiast',
+    notifications: true
+  })
+  
+  const [isSaving, setIsSaving] = React.useState<boolean>(false)
+  const [successMessage, setSuccessMessage] = React.useState<string>('')
+  
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
+    const { name, value, type } = e.target as HTMLInputElement
+    const checked = type === 'checkbox' ? (e.target as HTMLInputElement).checked : undefined
+    
+    setFormData((prevState: ProfileFormData) => ({
+      ...prevState,
+      [name]: type === 'checkbox' ? checked : value
+    }))
+  }
+  
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
+    e.preventDefault()
+    setIsSaving(true)
+    
+    // Simulate API call
+    setTimeout(() => {
+      setIsSaving(false)
+      setSuccessMessage('Profile updated successfully!')
+      
+      // Hide success message after 3 seconds
+      setTimeout(() => {
+        setSuccessMessage('')
+      }, 3000)
+    }, 1000)
+  }
+  
   return (
-    <div className="bg-white shadow overflow-hidden sm:rounded-lg">
-      <div className="px-4 py-5 sm:px-6">
-        <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
-        <p className="mt-1 max-w-2xl text-sm text-gray-500">
-          Manage your account settings
-        </p>
-      </div>
-      <div className="border-t border-gray-200">
-        <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-          <div className="text-sm font-medium text-gray-500">Profile Information</div>
+    <div className="max-w-2xl mx-auto">
+      <h1 className="text-2xl font-bold text-gray-900 mb-6">Account Settings</h1>
+      
+      {successMessage && (
+        <div className="bg-green-50 border-l-4 border-green-400 p-4 mb-6" role="alert">
+          <p className="text-green-700">{successMessage}</p>
         </div>
-        <div className="px-4 py-5 sm:p-6">
-          <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
-            <div className="sm:col-span-3">
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700">Name</label>
-              <div className="mt-1">
-                <input
-                  type="text"
-                  name="name"
-                  id="name"
-                  className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                  placeholder="Your name"
-                />
-              </div>
-            </div>
-            <div className="sm:col-span-3">
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
-              <div className="mt-1">
-                <input
-                  type="email"
-                  name="email"
-                  id="email"
-                  className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                  placeholder="Your email"
-                />
-              </div>
-            </div>
-            <div className="sm:col-span-6">
-              <button
-                type="button"
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-              >
-                Save Changes
-              </button>
-            </div>
+      )}
+      
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div>
+          <label htmlFor="name" className="block text-sm font-medium text-gray-700">Name</label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            value={formData.name}
+            onChange={handleInputChange}
+            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            aria-label="Your name"
+            required
+          />
+        </div>
+        
+        <div>
+          <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email Address</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            value={formData.email}
+            onChange={handleInputChange}
+            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            aria-label="Your email address"
+            required
+          />
+        </div>
+        
+        <div>
+          <label htmlFor="bio" className="block text-sm font-medium text-gray-700">Bio</label>
+          <textarea
+            id="bio"
+            name="bio"
+            rows={4}
+            value={formData.bio}
+            onChange={handleInputChange}
+            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            aria-label="Your bio"
+          />
+        </div>
+        
+        <div className="flex items-start">
+          <div className="flex items-center h-5">
+            <input
+              id="notifications"
+              name="notifications"
+              type="checkbox"
+              checked={formData.notifications}
+              onChange={handleInputChange}
+              className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+              aria-label="Enable email notifications"
+            />
+          </div>
+          <div className="ml-3 text-sm">
+            <label htmlFor="notifications" className="font-medium text-gray-700">Email Notifications</label>
+            <p className="text-gray-500">Receive booking confirmations and reminders</p>
           </div>
         </div>
-      </div>
+        
+        <div className="flex justify-end">
+          <button
+            type="submit"
+            disabled={isSaving}
+            className={`inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white ${
+              isSaving ? 'bg-indigo-400' : 'bg-indigo-600 hover:bg-indigo-700'
+            } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500`}
+            aria-label="Save settings"
+          >
+            {isSaving ? 'Saving...' : 'Save Changes'}
+          </button>
+        </div>
+      </form>
     </div>
   )
 }

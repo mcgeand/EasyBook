@@ -1,4 +1,6 @@
-const Home = () => {
+import * as React from 'react'
+
+const Home: React.FC = () => {
   return (
     <div className="bg-white shadow overflow-hidden sm:rounded-lg">
       <div className="px-4 py-5 sm:px-6">
