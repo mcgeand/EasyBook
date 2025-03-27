@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { KeyboardEventHandler, FormEventHandler } from 'react'
 
 interface LoginFormData {
   email: string;
@@ -21,7 +22,7 @@ const Login: React.FC = () => {
     }))
   }
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
+  const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault()
     // Form submission logic would go here
     console.log('Login attempt with:', formData)
@@ -39,7 +40,7 @@ const Login: React.FC = () => {
     console.log('Navigate to password recovery')
   }
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLAnchorElement>): void => {
+  const handleKeyDown: KeyboardEventHandler<HTMLAnchorElement> = (e) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault()
       e.currentTarget.click()
