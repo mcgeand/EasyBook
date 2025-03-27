@@ -15,6 +15,7 @@ The project is organized as a monorepo with the following structure:
 - User authentication and management
 - Service definition and management
 - Booking creation and management
+- External calendar integration (Google, Outlook)
 - Modern UI with responsive design
 - RESTful API with TypeScript
 - PostgreSQL database with Prisma ORM
@@ -101,6 +102,26 @@ The API is available at `http://localhost:5001/api` with the following endpoints
   - `POST /api/bookings`: Create a new booking
   - `PUT /api/bookings/:id`: Update a booking
   - `DELETE /api/bookings/:id`: Delete a booking
+
+- Calendars:
+  - `GET /api/calendars`: Get all calendars (optional query param: userId)
+  - `GET /api/calendars/:id`: Get a specific calendar by ID
+  - `POST /api/calendars`: Connect a new external calendar
+  - `DELETE /api/calendars/:id`: Remove a calendar connection
+
+## Data Models
+
+### User
+Standard user account with authentication.
+
+### Service
+Bookable services with pricing and duration.
+
+### Booking
+Appointments linking users to services with scheduling.
+
+### Calendar
+External calendar connections (Google, Outlook) for availability sync.
 
 ## Development Workflow
 
