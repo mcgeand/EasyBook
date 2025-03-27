@@ -13,7 +13,9 @@ The project is organized as a monorepo with the following structure:
 ## Features
 
 - User authentication and management
+- Service definition and management
 - Booking creation and management
+- External calendar integration (Google, Outlook)
 - Modern UI with responsive design
 - RESTful API with TypeScript
 - PostgreSQL database with Prisma ORM
@@ -48,7 +50,7 @@ The project is organized as a monorepo with the following structure:
 
 4. Access the application:
    - Frontend: http://localhost:5173
-   - Backend API: http://localhost:5000
+   - Backend API: http://localhost:5001
    - Prisma Studio (database UI): http://localhost:5555 (run `docker-compose exec backend npx prisma studio`)
 
 ### Development with Cursor
@@ -73,7 +75,10 @@ The project is organized as a monorepo with the following structure:
 
 ## API Documentation
 
-The API is available at `http://localhost:5000/api` with the following endpoints:
+The API is available at `http://localhost:5001/api` with the following endpoints:
+
+- Health Check:
+  - `GET /api/health`: Check if the API is running
 
 - Users:
   - `GET /api/users`: Get all users
@@ -83,6 +88,13 @@ The API is available at `http://localhost:5000/api` with the following endpoints
   - `DELETE /api/users/:id`: Delete a user
   - `POST /api/users/login`: User login
 
+- Services:
+  - `GET /api/services`: Get all services
+  - `GET /api/services/:id`: Get service by ID
+  - `POST /api/services`: Create a new service
+  - `PUT /api/services/:id`: Update a service
+  - `DELETE /api/services/:id`: Delete a service
+
 - Bookings:
   - `GET /api/bookings`: Get all bookings
   - `GET /api/bookings/:id`: Get booking by ID
@@ -90,6 +102,34 @@ The API is available at `http://localhost:5000/api` with the following endpoints
   - `POST /api/bookings`: Create a new booking
   - `PUT /api/bookings/:id`: Update a booking
   - `DELETE /api/bookings/:id`: Delete a booking
+
+- Calendars:
+  - `GET /api/calendars`: Get all calendars (optional query param: userId)
+  - `GET /api/calendars/:id`: Get a specific calendar by ID
+  - `POST /api/calendars`: Connect a new external calendar
+  - `DELETE /api/calendars/:id`: Remove a calendar connection
+
+## Data Models
+
+### User
+Standard user account with authentication.
+
+### Service
+Bookable services with pricing and duration.
+
+### Booking
+Appointments linking users to services with scheduling.
+
+### Calendar
+External calendar connections (Google, Outlook) for availability sync.
+
+## Development Workflow
+
+1. Create feature branches from the `dev` branch
+2. Make changes and commit to your feature branch
+3. Create a pull request to merge your feature branch into `dev`
+4. After review, merge to `dev`
+5. Periodically, `dev` is merged into `main` for releases
 
 ## License
 

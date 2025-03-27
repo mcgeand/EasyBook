@@ -13,6 +13,7 @@ import bookingRoutes from './routes/booking.routes';
 import userRoutes from './routes/user.routes';
 import healthRoutes from './routes/health.routes';
 import serviceRoutes from './routes/service.routes';
+import calendarRoutes from './routes/calendar.routes';
 
 // Initialize Express app
 const app: Express = express();
@@ -39,6 +40,7 @@ app.use('/api/bookings', bookingRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/health', healthRoutes);
 app.use('/api/services', serviceRoutes);
+app.use('/api/calendars', calendarRoutes);
 
 /**
  * Global error handling middleware
